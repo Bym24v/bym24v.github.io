@@ -698,7 +698,7 @@
                     </div>
                   </div>
                 </details>
-                <div class="field full">
+                <div class="field">
                   <label for="track">Tipo de pista</label>
                   <select id="track">
                     <option value="ptile">P-tile</option>
@@ -707,6 +707,14 @@
                     <option value="asphalt">Asfalto</option>
                     <option value="concrete">Hormigón pulido</option>
                     <option value="lowgrip">Bajo agarre</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="track-size">Tamaño de pista</label>
+                  <select id="track-size">
+                    <option value="small">Pequeña / ratonera</option>
+                    <option value="medium" selected>Media</option>
+                    <option value="large">Grande / recta larga</option>
                   </select>
                 </div>
               </div>
@@ -832,6 +840,12 @@
         lowgrip: { label: "Bajo agarre", min: 7.0, max: 9.2, note: "Con poco agarre, un FDR más corto ayuda a dosificar y no cargar tanto el motor." },
       };
 
+      const trackSizes = {
+        small: { label: "Pequeña", shift: 0.45, note: "pista pequeña: mejor salida y control" },
+        medium: { label: "Media", shift: 0, note: "pista media: rango base" },
+        large: { label: "Grande", shift: -0.45, note: "pista grande: permite alargar para recta" },
+      };
+
       const fields = [
         "spur",
         "pinion",
@@ -871,6 +885,7 @@
       };
       const preset = document.getElementById("preset");
       const track = document.getElementById("track");
+      const trackSize = document.getElementById("track-size");
 
       function readNumber(id) {
         return Number.parseFloat(fields[id].value);
@@ -898,7 +913,14 @@
         const circumference = Math.PI * tire;
         const rollout = circumference / fdr;
         const needle = Math.max(0, Math.min(100, ((fdr - 3) / 8) * 100));
-        const selectedTrack = tracks[track.value] || tracks.ptile;
+        const baseTrack = tracks[track.value] || tracks.ptile;
+        const size = trackSizes[trackSize.value] || trackSizes.medium;
+        const selectedTrack = {
+          label: `${baseTrack.label} · ${size.label}`,
+          min: Math.max(2.5, baseTrack.min + size.shift),
+          max: Math.max(3.2, baseTrack.max + size.shift),
+          note: `${baseTrack.note} Ajuste por ${size.note}.`,
+        };
         const trackMid = (selectedTrack.min + selectedTrack.max) / 2;
         const trackNeedle = Math.max(0, Math.min(100, ((fdr - selectedTrack.min) / (selectedTrack.max - selectedTrack.min)) * 100));
 
@@ -947,6 +969,7 @@
           if (fields[key]) fields[key].value = value;
           if (key === "track") track.value = value;
         });
+        trackSize.value = "medium";
         output.setupLabel.textContent = data.label;
         calculate();
       }
@@ -1010,6 +1033,12 @@
       });
 
       track.addEventListener("change", () => {
+        preset.value = "custom";
+        output.setupLabel.textContent = "Custom";
+        calculate();
+      });
+
+      trackSize.addEventListener("change", () => {
         preset.value = "custom";
         output.setupLabel.textContent = "Custom";
         calculate();
