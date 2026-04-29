@@ -1,4 +1,1009 @@
-<html>
-  <head></head>
-  <body>Hello</body>
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculadora FDR RC 1/10</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f6f5;
+        --panel: #ffffff;
+        --panel-strong: #18232a;
+        --ink: #172027;
+        --muted: #69777f;
+        --line: #d8e0df;
+        --accent: #e95432;
+        --accent-2: #1f8a70;
+        --accent-3: #255f85;
+        --soft: #eef3f1;
+        --warn: #a96c17;
+        --shadow: 0 18px 50px rgba(26, 38, 45, 0.12);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          linear-gradient(135deg, rgba(31, 138, 112, 0.1), transparent 36%),
+          linear-gradient(315deg, rgba(233, 84, 50, 0.1), transparent 42%), var(--bg);
+        color: var(--ink);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      .app {
+        width: 100%;
+        margin: 0;
+        padding: 36px clamp(24px, 3vw, 56px) 48px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-width: 0;
+      }
+
+      .mark {
+        display: grid;
+        width: 58px;
+        height: 58px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--panel-strong);
+        color: #fff;
+        font-weight: 900;
+        letter-spacing: 0;
+        box-shadow: var(--shadow);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 3vw, 3.2rem);
+        line-height: 1.05;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(520px, 1.02fr) minmax(520px, 0.98fr);
+        gap: 28px;
+        align-items: start;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 24px 28px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 1.3rem;
+      }
+
+      .preset-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .preset-row label {
+        color: var(--muted);
+        font-size: 0.98rem;
+        font-weight: 800;
+      }
+
+      select {
+        min-height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
+        padding: 0 42px 0 14px;
+        cursor: pointer;
+      }
+
+      .form {
+        display: grid;
+        gap: 28px;
+        padding: 28px;
+      }
+
+      .section {
+        display: grid;
+        gap: 18px;
+      }
+
+      .section h2 {
+        margin: 0;
+        font-size: 0.98rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .field {
+        display: grid;
+        gap: 10px;
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        color: var(--ink);
+        font-size: 1.02rem;
+        font-weight: 800;
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      input {
+        width: 100%;
+        min-height: 58px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
+        padding: 14px 58px 14px 16px;
+        font-size: 1.12rem;
+        outline: none;
+        transition:
+          border-color 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      input:focus {
+        border-color: var(--accent-2);
+        box-shadow: 0 0 0 4px rgba(31, 138, 112, 0.14);
+      }
+
+      .suffix {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        translate: 0 -50%;
+        color: var(--muted);
+        font-size: 0.94rem;
+        font-weight: 800;
+        pointer-events: none;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+      }
+
+      .primary,
+      .ghost {
+        min-height: 56px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-weight: 900;
+      }
+
+      .primary {
+        border: 0;
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .ghost {
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        padding: 0 22px;
+      }
+
+      .results {
+        display: grid;
+        gap: 22px;
+        padding: 28px;
+      }
+
+      .hero-result {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.72fr);
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .fdr-box {
+        display: grid;
+        gap: 14px;
+        min-height: 250px;
+        padding: 32px;
+        border-radius: 8px;
+        background: var(--panel-strong);
+        color: #fff;
+      }
+
+      .metric-label {
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 1.05rem;
+        font-weight: 800;
+      }
+
+      .metric-value {
+        align-self: end;
+        font-size: clamp(5rem, 9vw, 8.5rem);
+        font-weight: 950;
+        line-height: 0.88;
+        letter-spacing: 0;
+      }
+
+      .metric-note {
+        color: rgba(255, 255, 255, 0.74);
+        font-size: 1.08rem;
+      }
+
+      .ratio-visual {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 250px;
+        border-radius: 8px;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(31, 138, 112, 0.18), transparent 44%),
+          var(--soft);
+        border: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .gear {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        border: 8px solid currentColor;
+        background: #fff;
+        color: var(--accent-3);
+        font-weight: 950;
+        box-shadow:
+          inset 0 0 0 8px rgba(37, 95, 133, 0.12),
+          0 12px 24px rgba(26, 38, 45, 0.12);
+        z-index: 2;
+      }
+
+      .gear.spur {
+        width: 142px;
+        height: 142px;
+        left: 38px;
+        top: 54px;
+        color: var(--accent-2);
+      }
+
+      .gear.pinion {
+        width: 92px;
+        height: 92px;
+        right: 44px;
+        top: 78px;
+        color: var(--accent);
+      }
+
+      .shaft {
+        position: absolute;
+        width: 190px;
+        height: 14px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(31, 138, 112, 0.45), rgba(233, 84, 50, 0.48));
+        rotate: -8deg;
+      }
+
+      .hint {
+        margin: -3px 0 0;
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.45;
+      }
+
+      .gearbox-mode {
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 16px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--soft);
+      }
+
+      .gearbox-mode h3 {
+        margin: 0;
+        font-size: 1.08rem;
+      }
+
+      details {
+        grid-column: 1 / -1;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      summary {
+        min-height: 54px;
+        padding: 16px 20px;
+        cursor: pointer;
+        font-weight: 900;
+      }
+
+      .details-body {
+        display: grid;
+        gap: 18px;
+        padding: 0 20px 20px;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 16px;
+      }
+
+      .stat {
+        display: grid;
+        gap: 10px;
+        min-height: 132px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 0.96rem;
+        font-weight: 800;
+      }
+
+      .stat strong {
+        align-self: end;
+        font-size: clamp(2rem, 3.2vw, 2.8rem);
+        line-height: 1.08;
+        overflow-wrap: anywhere;
+      }
+
+      .comparison {
+        display: grid;
+        gap: 14px;
+        padding: 20px;
+        border-radius: 8px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+      }
+
+      .comparison-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .comparison-head strong {
+        font-size: 1.06rem;
+      }
+
+      .pill {
+        border-radius: 999px;
+        background: #fff;
+        color: var(--muted);
+        padding: 7px 12px;
+        font-size: 0.88rem;
+        font-weight: 900;
+      }
+
+      .bar {
+        position: relative;
+        height: 20px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #256a92, #1f8a70, #e0a526, #e95432);
+        overflow: hidden;
+      }
+
+      .needle {
+        position: absolute;
+        top: -6px;
+        width: 7px;
+        height: 32px;
+        border-radius: 999px;
+        background: var(--panel-strong);
+        translate: -3px 0;
+        transition: left 180ms ease;
+      }
+
+      .scale {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 800;
+      }
+
+      .warning {
+        min-height: 32px;
+        color: var(--warn);
+        font-size: 1.02rem;
+        font-weight: 800;
+      }
+
+      @media (max-width: 1180px) {
+        .workspace,
+        .hero-result {
+          grid-template-columns: 1fr;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+      }
+
+      @media (max-width: 620px) {
+        .app {
+          padding: 18px 10px 28px;
+        }
+
+        .mark {
+          width: 48px;
+          height: 48px;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .form,
+        .results,
+        .panel-header {
+          padding: 18px;
+        }
+
+        .fdr-box,
+        .ratio-visual {
+          min-height: 210px;
+        }
+
+        .metric-value {
+          font-size: 4.4rem;
+        }
+
+        .field-grid,
+        .stat-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .panel-header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .preset-row,
+        .preset-row select {
+          width: 100%;
+        }
+
+        .actions {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">FDR</div>
+          <div>
+            <h1>Calculadora FDR RC 1/10</h1>
+            <p class="subtitle">Ajusta desarrollo primario, transmisión interna, ruedas y agarre de pista en una sola vista.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section class="panel" aria-labelledby="inputs-title">
+          <div class="panel-header">
+            <h2 class="panel-title" id="inputs-title">Setup</h2>
+            <div class="preset-row">
+              <label for="preset">Preset</label>
+              <select id="preset">
+                <option value="touring">Touring 1/10</option>
+                <option value="f1">F1 1/10</option>
+                <option value="drift">Drift 1/10</option>
+                <option value="offroad">Buggy 2WD 1/10</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+          </div>
+
+          <form class="form" id="calculator">
+            <div class="section">
+              <h2>Transmisión</h2>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="spur">Corona principal</label>
+                  <div class="input-wrap">
+                    <input id="spur" min="1" step="1" type="number" value="84" />
+                    <span class="suffix">T</span>
+                  </div>
+                  <p class="hint">La corona grande exterior, la que engrana con el motor.</p>
+                </div>
+                <div class="field">
+                  <label for="pinion">Piñón motor</label>
+                  <div class="input-wrap">
+                    <input id="pinion" min="1" step="1" type="number" value="28" />
+                    <span class="suffix">T</span>
+                  </div>
+                  <p class="hint">El piñón pequeño montado en el eje del motor.</p>
+                </div>
+                <div class="field full">
+                  <label for="internal">Ratio interno</label>
+                  <div class="input-wrap">
+                    <input id="internal" min="0.1" step="0.01" type="number" value="1.90" />
+                    <span class="suffix">:1</span>
+                  </div>
+                  <p class="hint" id="internal-note">Puedes escribirlo a mano o calcularlo con engranajes o poleas de la transmisión.</p>
+                </div>
+                <div class="gearbox-mode">
+                  <h3>Transmisión rápida</h3>
+                  <p class="hint">Vale para piñones, poleas y correas. Pon el elemento que mueve la transmisión y el elemento movido del diferencial/salida.</p>
+                  <div class="field-grid">
+                    <div class="field">
+                      <label for="input-gear">Entrada transmisión</label>
+                      <div class="input-wrap">
+                        <input id="input-gear" min="1" placeholder="ej. 20" step="1" type="number" />
+                        <span class="suffix">T</span>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label for="diff-gear">Salida / diferencial</label>
+                      <div class="input-wrap">
+                        <input id="diff-gear" min="1" placeholder="ej. 38" step="1" type="number" />
+                        <span class="suffix">T</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <details id="advanced-gearbox">
+                  <summary>Transmisión avanzada con varias etapas</summary>
+                  <div class="details-body">
+                    <p class="hint">Usa esto si hay varias reducciones reales con piñones dobles, poleas o correas. En cada etapa: elemento movido dividido entre elemento que mueve.</p>
+                    <div class="field-grid">
+                      <div class="field">
+                        <label for="box-driven-1">Etapa 1 movido</label>
+                        <div class="input-wrap">
+                          <input id="box-driven-1" min="1" placeholder="ej. 30" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driver-1">Etapa 1 mueve</label>
+                        <div class="input-wrap">
+                          <input id="box-driver-1" min="1" placeholder="ej. 20" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driven-2">Etapa 2 movido</label>
+                        <div class="input-wrap">
+                          <input id="box-driven-2" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driver-2">Etapa 2 mueve</label>
+                        <div class="input-wrap">
+                          <input id="box-driver-2" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driven-3">Etapa 3 movido</label>
+                        <div class="input-wrap">
+                          <input id="box-driven-3" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driver-3">Etapa 3 mueve</label>
+                        <div class="input-wrap">
+                          <input id="box-driver-3" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driven-4">Etapa 4 movido</label>
+                        <div class="input-wrap">
+                          <input id="box-driven-4" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label for="box-driver-4">Etapa 4 mueve</label>
+                        <div class="input-wrap">
+                          <input id="box-driver-4" min="1" placeholder="opcional" step="1" type="number" />
+                          <span class="suffix">T</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+                <div class="field full">
+                  <label for="track">Tipo de pista</label>
+                  <select id="track">
+                    <option value="ptile">P-tile</option>
+                    <option value="epoxy">Epoxy</option>
+                    <option value="carpet">Moqueta</option>
+                    <option value="asphalt">Asfalto</option>
+                    <option value="concrete">Hormigón pulido</option>
+                    <option value="lowgrip">Bajo agarre</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>Rueda</h2>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="tire">Diámetro rueda</label>
+                  <div class="input-wrap">
+                    <input id="tire" min="1" step="0.1" type="number" value="63.5" />
+                    <span class="suffix">mm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="submit">Calcular</button>
+              <button class="ghost" id="reset" type="button">Reset</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel" aria-labelledby="results-title">
+          <div class="panel-header">
+            <h2 class="panel-title" id="results-title">Resultados</h2>
+            <span class="pill" id="setup-label">Touring 1/10</span>
+          </div>
+
+          <div class="results" aria-live="polite">
+            <div class="hero-result">
+              <div class="fdr-box">
+                <span class="metric-label">FDR</span>
+                <strong class="metric-value" id="fdr">5.70</strong>
+                <span class="metric-note" id="fdr-note">1 vuelta de rueda por cada 5.70 vueltas de motor</span>
+              </div>
+              <div class="ratio-visual" aria-hidden="true">
+                <div class="shaft"></div>
+                <div class="gear spur" id="spur-gear">84</div>
+                <div class="gear pinion" id="pinion-gear">28</div>
+              </div>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat">
+                <span>Corona / piñón</span>
+                <strong id="primary-ratio">3.00</strong>
+              </div>
+              <div class="stat">
+                <span>Rollout</span>
+                <strong id="rollout">35.0 mm</strong>
+              </div>
+              <div class="stat">
+                <span>Ratio interno</span>
+                <strong id="internal-result">1.90</strong>
+              </div>
+              <div class="stat">
+                <span>Objetivo pista</span>
+                <strong id="track-target">5.4-7.0</strong>
+              </div>
+            </div>
+
+            <div class="comparison">
+              <div class="comparison-head">
+                <strong>Qué es el rollout</strong>
+                <span class="pill" id="rollout-label">por vuelta de motor</span>
+              </div>
+              <p class="hint" id="rollout-note">El coche avanza 35.0 mm por cada vuelta del motor. Más rollout suele ser más punta; menos rollout suele ser más salida.</p>
+            </div>
+
+            <div class="comparison">
+              <div class="comparison-head">
+                <strong>Zona de desarrollo</strong>
+                <span class="pill" id="range-label">equilibrado</span>
+              </div>
+              <div class="bar">
+                <span class="needle" id="needle"></span>
+              </div>
+              <div class="scale">
+                <span>largo</span>
+                <span>medio</span>
+                <span>corto</span>
+              </div>
+            </div>
+
+            <div class="comparison">
+              <div class="comparison-head">
+                <strong>Lectura para la pista</strong>
+                <span class="pill" id="track-label">P-tile</span>
+              </div>
+              <div class="bar">
+                <span class="needle" id="track-needle"></span>
+              </div>
+              <div class="scale">
+                <span>largo</span>
+                <span>ideal</span>
+                <span>corto</span>
+              </div>
+            </div>
+
+            <div class="warning" id="warning"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const presets = {
+        touring: { label: "Touring 1/10", spur: 84, pinion: 28, internal: 1.9, tire: 63.5, track: "ptile" },
+        f1: { label: "F1 1/10", spur: 96, pinion: 29, internal: 1, tire: 63, track: "carpet" },
+        drift: { label: "Drift 1/10", spur: 86, pinion: 22, internal: 2.6, tire: 63, track: "epoxy" },
+        offroad: { label: "Buggy 2WD 1/10", spur: 78, pinion: 24, internal: 2.6, tire: 85, track: "lowgrip" },
+      };
+
+      const tracks = {
+        ptile: { label: "P-tile", min: 5.4, max: 7.0, note: "P-tile suele pedir un desarrollo algo más conservador para salir limpio sin calentar de más." },
+        epoxy: { label: "Epoxy", min: 5.0, max: 6.7, note: "Epoxy permite ir medio-largo si hay agarre y la recta acompaña." },
+        carpet: { label: "Moqueta", min: 4.6, max: 6.2, note: "Moqueta con mucho agarre suele aceptar desarrollo más largo, vigilando temperatura." },
+        asphalt: { label: "Asfalto", min: 5.8, max: 7.6, note: "Asfalto cambia mucho con goma y temperatura; empieza medio y ajusta por motor." },
+        concrete: { label: "Hormigón pulido", min: 6.4, max: 8.4, note: "En hormigón pulido suele convenir acortar para ganar salida y control." },
+        lowgrip: { label: "Bajo agarre", min: 7.0, max: 9.2, note: "Con poco agarre, un FDR más corto ayuda a dosificar y no cargar tanto el motor." },
+      };
+
+      const fields = [
+        "spur",
+        "pinion",
+        "internal",
+        "tire",
+        "input-gear",
+        "diff-gear",
+        "box-driven-1",
+        "box-driver-1",
+        "box-driven-2",
+        "box-driver-2",
+        "box-driven-3",
+        "box-driver-3",
+        "box-driven-4",
+        "box-driver-4",
+      ].reduce((acc, id) => {
+        acc[id] = document.getElementById(id);
+        return acc;
+      }, {});
+      const output = {
+        fdr: document.getElementById("fdr"),
+        fdrNote: document.getElementById("fdr-note"),
+        primaryRatio: document.getElementById("primary-ratio"),
+        rollout: document.getElementById("rollout"),
+        rolloutNote: document.getElementById("rollout-note"),
+        internalResult: document.getElementById("internal-result"),
+        internalNote: document.getElementById("internal-note"),
+        trackTarget: document.getElementById("track-target"),
+        rangeLabel: document.getElementById("range-label"),
+        needle: document.getElementById("needle"),
+        trackNeedle: document.getElementById("track-needle"),
+        trackLabel: document.getElementById("track-label"),
+        warning: document.getElementById("warning"),
+        setupLabel: document.getElementById("setup-label"),
+        spurGear: document.getElementById("spur-gear"),
+        pinionGear: document.getElementById("pinion-gear"),
+      };
+      const preset = document.getElementById("preset");
+      const track = document.getElementById("track");
+
+      function readNumber(id) {
+        return Number.parseFloat(fields[id].value);
+      }
+
+      function format(value, decimals = 2) {
+        if (!Number.isFinite(value)) return "--";
+        return value.toFixed(decimals);
+      }
+
+      function calculate() {
+        const spur = readNumber("spur");
+        const pinion = readNumber("pinion");
+        const tire = readNumber("tire");
+        const internal = readNumber("internal");
+        const valid = [spur, pinion, internal, tire].every((value) => Number.isFinite(value) && value > 0);
+
+        if (!valid) {
+          output.warning.textContent = "Revisa transmisión y rueda: esos valores deben ser mayores que cero.";
+          return;
+        }
+
+        const primaryRatio = spur / pinion;
+        const fdr = primaryRatio * internal;
+        const circumference = Math.PI * tire;
+        const rollout = circumference / fdr;
+        const needle = Math.max(0, Math.min(100, ((fdr - 3) / 8) * 100));
+        const selectedTrack = tracks[track.value] || tracks.ptile;
+        const trackMid = (selectedTrack.min + selectedTrack.max) / 2;
+        const trackNeedle = Math.max(0, Math.min(100, ((fdr - selectedTrack.min) / (selectedTrack.max - selectedTrack.min)) * 100));
+
+        output.fdr.textContent = format(fdr, 2);
+        output.fdrNote.textContent = `1 vuelta de rueda por cada ${format(fdr, 2)} vueltas de motor`;
+        output.primaryRatio.textContent = format(primaryRatio, 2);
+        output.rollout.textContent = `${format(rollout, 1)} mm`;
+        output.rolloutNote.textContent = `El coche avanza ${format(rollout, 1)} mm por cada vuelta del motor. Más rollout suele ser más punta; menos rollout suele ser más salida.`;
+        output.internalResult.textContent = format(internal, 2);
+        output.needle.style.left = `${needle}%`;
+        output.trackNeedle.style.left = `${trackNeedle}%`;
+        output.trackLabel.textContent = selectedTrack.label;
+        output.trackTarget.textContent = `${format(selectedTrack.min, 1)}-${format(selectedTrack.max, 1)}`;
+        output.spurGear.textContent = Math.round(spur);
+        output.pinionGear.textContent = Math.round(pinion);
+
+        if (fdr < 4.5) {
+          output.rangeLabel.textContent = "largo";
+        } else if (fdr > 8) {
+          output.rangeLabel.textContent = "corto";
+        } else {
+          output.rangeLabel.textContent = "equilibrado";
+        }
+
+        if (fdr < selectedTrack.min) {
+          output.warning.textContent = `Para ${selectedTrack.label} vas largo. Sube dientes de corona o baja piñón si el motor se calienta o falta salida.`;
+        } else if (fdr > selectedTrack.max) {
+          output.warning.textContent = `Para ${selectedTrack.label} vas corto. Baja corona o sube piñón si te falta punta en recta.`;
+        } else if (Math.abs(fdr - trackMid) < 0.25) {
+          output.warning.textContent = `${selectedTrack.label}: estás justo en el centro de la ventana orientativa.`;
+        } else if (fdr > 8) {
+          output.warning.textContent = `${selectedTrack.note} Estás dentro del rango, tirando a corto.`;
+        } else {
+          output.warning.textContent = `${selectedTrack.note} Estás dentro del rango orientativo.`;
+        }
+      }
+
+      function applyPreset(name) {
+        const data = presets[name];
+        if (!data) return;
+        ["input-gear", "diff-gear", "box-driven-1", "box-driver-1", "box-driven-2", "box-driver-2", "box-driven-3", "box-driver-3", "box-driven-4", "box-driver-4"].forEach((key) => {
+          fields[key].value = "";
+        });
+        output.internalNote.textContent = "Puedes escribirlo a mano o calcularlo con engranajes o poleas de la transmisión.";
+        Object.entries(data).forEach(([key, value]) => {
+          if (fields[key]) fields[key].value = value;
+          if (key === "track") track.value = value;
+        });
+        output.setupLabel.textContent = data.label;
+        calculate();
+      }
+
+      function calculateInternalFromBox() {
+        let ratio = 1;
+        const parts = [];
+        const advancedStages = [1, 2, 3, 4].map((index) => {
+          const driven = readNumber(`box-driven-${index}`);
+          const driver = readNumber(`box-driver-${index}`);
+          const ready = Number.isFinite(driven) && Number.isFinite(driver) && driven > 0 && driver > 0;
+          return { driven, driver, ready };
+        });
+        const hasAdvanced = advancedStages.some((stage) => stage.ready);
+
+        if (hasAdvanced) {
+          advancedStages.forEach((stage) => {
+            if (!stage.ready) return;
+            ratio *= stage.driven / stage.driver;
+            parts.push(`${format(stage.driven, 0)}/${format(stage.driver, 0)}`);
+          });
+
+          fields.internal.value = format(ratio, 3);
+          output.internalNote.textContent = `Ratio interno avanzado: ${parts.join(" x ")} = ${format(ratio, 3)}:1`;
+          return true;
+        }
+
+        const inputGear = readNumber("input-gear");
+        const diffGear = readNumber("diff-gear");
+        const simpleReady = Number.isFinite(inputGear) && Number.isFinite(diffGear) && inputGear > 0 && diffGear > 0;
+
+        if (!simpleReady) {
+          output.internalNote.textContent = "Puedes escribirlo a mano o calcularlo con engranajes o poleas de la transmisión.";
+          return false;
+        }
+
+        ratio = diffGear / inputGear;
+        fields.internal.value = format(ratio, 3);
+        output.internalNote.textContent = `Ratio interno rapido: salida ${format(diffGear, 0)} / entrada ${format(inputGear, 0)} = ${format(ratio, 3)}:1`;
+        return true;
+      }
+
+      document.getElementById("calculator").addEventListener("submit", (event) => {
+        event.preventDefault();
+        calculate();
+      });
+
+      document.getElementById("reset").addEventListener("click", () => {
+        preset.value = "touring";
+        applyPreset("touring");
+      });
+
+      Object.values(fields).forEach((field) => {
+        field.addEventListener("input", () => {
+          preset.value = "custom";
+          output.setupLabel.textContent = "Custom";
+          if (field.id.startsWith("box-") || field.id === "input-gear" || field.id === "diff-gear") calculateInternalFromBox();
+          if (field.id === "internal") output.internalNote.textContent = "Ratio interno escrito manualmente.";
+          calculate();
+        });
+      });
+
+      track.addEventListener("change", () => {
+        preset.value = "custom";
+        output.setupLabel.textContent = "Custom";
+        calculate();
+      });
+
+      preset.addEventListener("change", (event) => {
+        if (event.target.value === "custom") {
+          output.setupLabel.textContent = "Custom";
+          calculate();
+          return;
+        }
+        applyPreset(event.target.value);
+      });
+
+      calculate();
+    </script>
+  </body>
 </html>
