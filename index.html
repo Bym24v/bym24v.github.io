@@ -91,6 +91,23 @@
         font-size: 1.08rem;
       }
 
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .meta-badge {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--muted);
+        padding: 7px 12px;
+        font-size: 0.9rem;
+        font-weight: 900;
+      }
+
       .workspace {
         display: grid;
         grid-template-columns: minmax(520px, 1.02fr) minmax(520px, 0.98fr);
@@ -545,6 +562,10 @@
           <div>
             <h1>Calculadora FDR RC 1/10</h1>
             <p class="subtitle">Ajusta desarrollo primario, transmisión interna, ruedas y agarre de pista en una sola vista.</p>
+            <div class="meta-row" aria-label="Información de la herramienta">
+              <span class="meta-badge">Designed by Mayoyo</span>
+              <span class="meta-badge">Beta</span>
+            </div>
           </div>
         </div>
       </header>
